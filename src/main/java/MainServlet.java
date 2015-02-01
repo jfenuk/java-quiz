@@ -1,16 +1,17 @@
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fenuk.java.quiz.dao.DaoFactory;
-import com.fenuk.java.quiz.dao.QuizDao;
-import com.fenuk.java.quiz.dao.mongodb.MongoDBDaoFactory;
-import com.mongodb.MongoClient;
+import org.mongodb.morphia.Datastore;
 
-@WebServlet(urlPatterns = "/home")
+import com.fenuk.java.quiz.entity.User;
+
+@WebServlet("/home/*")
 public class MainServlet extends HttpServlet {
 
 	/**
@@ -20,14 +21,18 @@ public class MainServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+			throws IOException, ServletException {
 
-		DaoFactory factory = new MongoDBDaoFactory((MongoClient) request
-				.getServletContext().getAttribute("MONGO_CLIENT"));
-		QuizDao quizDao = factory.getQuizDao();
+		Datastore ds = (Datastore) request.getServletContext()
+				.getAttribute("MONGO_DATASTORE");
+		
+        request.setAttribute("user", new User("Eugene"));
+
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
+        dispatcher.forward(request, response);
+		
 
 		// response.sendRedirect("home.jsp");
 
 	}
-
 }
